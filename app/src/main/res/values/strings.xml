@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">todoboom</string>
+    <string name="create_button">Create</string>
+    <string name="empty_error">you can\'t create an empty TODO item, oh silly!</string>
+</resources>
