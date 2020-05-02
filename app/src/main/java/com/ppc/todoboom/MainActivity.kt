@@ -1,75 +1,69 @@
 package com.ppc.todoboom
 
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import android.os.Bundle
-import android.view.View
+import android.view.Gravity
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.random.Random
+
 
 class MainActivity : AppCompatActivity() {
 
-//    val create = findViewById<Button>(R.id.createButton)
-//    val inputText = findViewById<EditText>(R.id.inputText)
+    private val adapter = TaskAdapter(R.layout.item_one_task)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        val tv = findViewById<TextView>(R.id.textView)
-//
-//        create.setOnClickListener {
-//            if (inputText.text.equals("")) {
-//                Toast.makeText(applicationContext, R.string.empty_error, Toast.LENGTH_SHORT).show()
-//            } else {
-//                tv.text = inputText.text.toString()
-//                TODO("Add the new task to the recycler")
-//            }
-//            inputText.setText("")
-//        }
-
-        setupListAdapter()
-    }
-
-    private fun setupListAdapter(){
-        val create = findViewById<Button>(R.id.createButton)
-        val inputText = findViewById<EditText>(R.id.inputText)
-
-        val context = this
-        val tasks = mutableListOf<Task>()
-        val adapter = TaskListAdapter()
-
-        task_recycler.adapter = adapter
-        task_recycler.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-
-        adapter.onItemClickCallback = { task, holder ->
-            Toast.makeText(this, "Tap on ${task.description}", Toast.LENGTH_SHORT).show()
-            if (!task.isDone) {
-                task.isDone = true
-                holder.text.setTextColor(Color.argb(40, 180, 180, 180))
-                adapter.submitList(tasks.toList())
+        if (savedInstanceState != null){
+            val taskNumber = savedInstanceState.getInt("taskNumber")
+            for (i in 0 until taskNumber){
+                val taskDescription = savedInstanceState.getString("description"+i.toString()).toString()
+                val taskDone = savedInstanceState.getBoolean("done"+i.toString())
+                adapter.setTask(Task(taskDescription,taskDone))
             }
         }
+
+        val create: Button = findViewById(R.id.createButton)
+        val inputText: EditText = findViewById(R.id.inputText)
+
+        val recycler:RecyclerView = findViewById(R.id.task_recycler)
+        recycler.layoutManager =  LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        recycler.adapter = adapter
 
         create.setOnClickListener {
-            if (inputText.text.toString() == "") {
-                Toast.makeText(applicationContext, R.string.empty_error, Toast.LENGTH_SHORT).show()
+            if (inputText.text.isEmpty()) {
+                val toast = Toast.makeText(applicationContext, R.string.empty_error, Toast.LENGTH_SHORT)
+                toast.setGravity(Gravity.CENTER, 0, 0)
+                toast.show()
             } else {
-                val task = Task(description = inputText.text.toString())
+                val task = Task(inputText.text.toString())
+                inputText.text.clear()
 
-//                if (tasks.isEmpty()) {
-//                    tasks += task
-//                } else {
-//                    val index = Random.nextInt(until = tasks.size)
-//                    tasks.add(index, task)
-//                }
-                tasks.add(task)
-                adapter.submitList(tasks)
+                // Hide the keyboard
+                val manager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(it.windowToken, 0)
 
+                adapter.setTask(task)
+                adapter.notifyItemInserted(adapter.itemCount - 1)
             }
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        val tasks = adapter.getTasks()
+        var i = 0
+        for (task in tasks){
+            outState.putString("description" + i.toString(), task.description)
+            outState.putBoolean("done" + i.toString(), task.done)
+            ++i
+        }
+        outState.putInt("taskNumber", i)
+    }
+
 }
