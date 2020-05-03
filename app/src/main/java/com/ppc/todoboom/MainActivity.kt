@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-
 class MainActivity : AppCompatActivity() {
 
+    /* The adapter for the recycler view */
     private val adapter = TaskAdapter(R.layout.item_one_task)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,9 +21,9 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null){
             val taskNumber = savedInstanceState.getInt("taskNumber")
             for (i in 0 until taskNumber){
-                val taskDescription = savedInstanceState.getString("description"+i.toString()).toString()
-                val taskDone = savedInstanceState.getBoolean("done"+i.toString())
-                adapter.setTask(Task(taskDescription,taskDone))
+                val taskDescription = savedInstanceState.getString("description" + i.toString()).toString()
+                val taskDone = savedInstanceState.getBoolean("done" + i.toString())
+                adapter.addTask(Task(taskDescription,taskDone))
             }
         }
 
@@ -47,12 +47,15 @@ class MainActivity : AppCompatActivity() {
                 val manager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 manager.hideSoftInputFromWindow(it.windowToken, 0)
 
-                adapter.setTask(task)
+                adapter.addTask(task)
                 adapter.notifyItemInserted(adapter.itemCount - 1)
             }
         }
     }
 
+    /**
+     * Handle instance save to enable the app to survive changes
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 

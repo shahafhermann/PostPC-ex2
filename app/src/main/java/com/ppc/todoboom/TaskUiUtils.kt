@@ -12,7 +12,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
-
+/**
+ * Data class for a task
+ */
 data class Task(val description: String, var done: Boolean = false) {
     fun setDone() {
         done = true
@@ -23,6 +25,9 @@ data class Task(val description: String, var done: Boolean = false) {
     }
 }
 
+/**
+ * A class representing a task holder for the recycler view.
+ */
 class TaskHolder(view: View): RecyclerView.ViewHolder(view){
     val text: TextView = view.findViewById(R.id.taskText)
 
@@ -32,16 +37,25 @@ class TaskHolder(view: View): RecyclerView.ViewHolder(view){
     }
 }
 
+/**
+ * Recycler view adapter class (for task holders)
+ */
 class TaskAdapter(layoutId: Int): RecyclerView.Adapter<TaskHolder>() {
 
     private var elementLayout = layoutId
     private var _tasks :MutableList<Task> = ArrayList()
 
+    /**
+     * Get the list of tasks
+     */
     fun getTasks(): MutableList<Task> {
         return _tasks
     }
 
-    fun setTask(tasks : Task){
+    /**
+     * add a task to the list
+     */
+    fun addTask(tasks : Task){
         _tasks.add(tasks)
         notifyDataSetChanged()
     }
